@@ -1,0 +1,37 @@
+server:
+  port: 43951
+  tomcat:
+    accept-count: 5000
+    max-threads: 256
+    min-spare-threads: 32
+
+spring:
+  mvc:
+    async:
+      request-timeout: 500
+
+servlet:
+  context-path: /api
+
+
+logging:
+  config: config/logback-spring.xml
+
+
+wechatwork:
+  corpid: [*common_user_wsdawWxWork]
+  corpsecret: [*common_pass_wsdawWxWork]
+
+
+system:
+  admin-private-key: [*key_wsdawAdminPrivateKey]
+  tokenExpireTime: 14400
+  dawConfigUrl: http://[@GLOBAL_WSDAW_CONFIG_IP_PORT]/api
+  dawTxProxyUrl: http://[@GLOBAL_WSDAW_TXPROXY_IP_PORT]/api
+  dawSafeboxUrl: http://[@GLOBAL_WSDAW_SAFEBOX_IP_PORT]/api
+  dawKeystoreUrl: http://[@GLOBAL_WSDAW_KEYSTORE_IP_PORT]/api
+  openFlag: true
+  relayPublicKeyHex: "b9660c28c3f0c7f1394040669b093c91732b299df07c3fe1c3c01afe83926162"
+  relaySeHex: [*key_wsdawRelayPrivateKey]
+
+

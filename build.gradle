@@ -1,0 +1,150 @@
+buildscript {
+	ext {
+		springBootVersion = '2.7.18'
+	}
+	repositories {
+		maven { url "http://maven.weoa.com/nexus/content/groups/public/"; }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath 'com.github.sherter.googlejavaformatgradleplugin:google-java-format-gradle-plugin:0.9-SNAPSHOT'
+	}
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.github.sherter.google-java-format'
+
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	maven {
+		url "http://maven.weoa.com/nexus/content/groups/public/"
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework:spring-web:5.3.37'
+
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation('cn.hutool:hutool-all:5.8.27')
+	implementation('org.yaml:snakeyaml:2.0')
+	implementation ("org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:3.6.0")
+
+	implementation "org.bitcoinj:bitcoinj-core:0.16.2"
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	implementation 'com.sun.mail:javax.mail:latest.release'
+
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+	runtimeOnly 'org.bouncycastle:bcprov-jdk18on:1.76'
+
+//	implementation 'io.springfox:springfox-swagger2:2.9.2'
+//	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly('org.projectlombok:lombok')
+	testAnnotationProcessor('org.projectlombok:lombok')
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+bootJar {
+	destinationDir file('dist')
+	archiveName project.name +'_4395' + '.jar'
+	from('src/main/java'){
+		include '**/*.xml'
+	}
+	exclude '**/*.properties'
+	exclude '**/*.yml'
+	exclude '**/*.xml'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+clean {
+	delete file('dist')
+}
+
+task aomp {
+	doLast {
+		copy {
+			from file('src/main/resources/aomp/start.sh')
+			from file('src/main/resources/aomp/start_uat.sh')
+			from file('src/main/resources/aomp/stop.sh')
+			into 'dist'
+		}
+		copy {
+			from file('src/main/resources/aomp/logback-spring.xml')
+			from file('src/main/resources/aomp/application.yml')
+			into 'dist/config'
+		}
+	}
+}
+
+task sit {
+	doLast {
+		copy {
+			from file('src/main/resources/sit/start.sh')
+			from file('src/main/resources/sit/stop.sh')
+			into 'dist'
+		}
+		copy {
+			from file('src/main/resources/sit/logback-spring.xml')
+			from file('src/main/resources/sit/application.yml')
+			into 'dist/config'
+		}
+	}
+}
+
+task dev {
+	doLast {
+		copy {
+			from file('config')
+			into 'dist/config/'
+		}
+		copy {
+			from file('src/main/resources/' )
+			include('**/*.yml')
+			into 'dist/config/'
+		}
+		copy {
+			from file('src/main/resources/')
+			include('**/*.sh')
+			into 'dist/'
+		}
+	}
+}
+
+
+tasks.withType(Copy) {
+	filesMatching("**/*.sql") {
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	}
+	filesMatching("**/*.yml") {
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	}
+	filesMatching("**/*.sh") {
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	}
+}
+
+googleJavaFormat {
+	toolVersion = '1.7'
+	options style: 'AOSP'
+	source = sourceSets*.allJava
+	include '**/*.java'
+}
