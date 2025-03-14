@@ -1,0 +1,4 @@
+src/main/java/com/webank/wsdaw/gateway/controller/*.java
+src/main/java/com/webank/wsdaw/gateway/advice/GlobalAdvice.java
+src/main/java/com/webank/wsdaw/gateway/aspect/WebLogAspect.java
+src/main/java/com/webank/wsdaw/gateway/service/**
